@@ -1,9 +1,99 @@
-import { configureStore } from '@reduxjs/toolkit';
+import {
+  configureStore,
+  createSlice,
+  type PayloadAction,
+  type Reducer,
+} from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
-import rootReducer from './rootReducer';
-import rootSaga from './rootSaga';
+import {
+  call,
+  put,
+  takeEvery,
+  delay,
+  select,
+  all,
+  fork,
+  type ForkEffect,
+} from 'redux-saga/effects';
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+// @ts-expect-error
+const context = require.context('./models', false, /\.ts$/);
+const models = context.keys().map((key: any) => context(key).default);
+
+export type StateType = Record<string, any>;
+export interface ModelType {
+  namespace: string;
+  state: StateType;
+  reducers: Record<
+    string,
+    (state: StateType, action: PayloadAction<any>) => StateType
+  >;
+  effects: Record<
+    string,
+    (
+      action: PayloadAction<any>,
+      effects: {
+        call: typeof call;
+        put: typeof put;
+        delay: typeof delay;
+        select: typeof select;
+      },
+    ) => Generator<any, void, any>
+  >;
+}
+
+function createReducer(model: ModelType): Reducer {
+  const reducers = model.reducers;
+  Object.keys(model.effects).forEach((key) => {
+    reducers[key] = (state: StateType, action: PayloadAction<any>) => state;
+  });
+  const slice = createSlice({
+    name: model.namespace,
+    initialState: model.state,
+    reducers,
+  });
+  return slice.reducer;
+}
+
+const rootReducer = models.reduce((prev: any, model: ModelType) => {
+  return { ...prev, [model.namespace]: createReducer(model) };
+}, {});
+
+function watchEffects(model: ModelType): ForkEffect {
+  return fork(function* () {
+    for (const key in model.effects) {
+      const effect = model.effects[key];
+      yield takeEvery(
+        `${model.namespace}/${key}`,
+        function* (action: PayloadAction) {
+          yield put({
+            type: 'loading/save',
+            payload: {
+              [`${model.namespace}/${key}`]: true,
+            },
+          });
+          yield effect(action, {
+            call,
+            put,
+            delay,
+            select,
+          });
+          yield put({
+            type: 'loading/save',
+            payload: {
+              [`${model.namespace}/${key}`]: false,
+            },
+          });
+        },
+      );
+    }
+  });
+}
+
+function* rootSaga(): Generator {
+  yield all(models.map((model: ModelType) => watchEffects(model)));
+}
+
 const configureAppStore = (initialState = {}) => {
   const reduxSagaMonitorOptions = {};
   const sagaMiddleware = createSagaMiddleware(reduxSagaMonitorOptions);
