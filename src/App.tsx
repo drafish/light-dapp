@@ -4,7 +4,7 @@ import CreatePage from './pages/Create';
 import HomePage from './pages/Home';
 import RemixHomePage from './pages/Remix/Home';
 import RemixCreatePage from './pages/Remix/Create';
-import 'react-toastify/dist/ReactToastify.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 export const router = createBrowserRouter([

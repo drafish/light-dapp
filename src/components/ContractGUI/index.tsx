@@ -22,9 +22,7 @@ export function ContractGUI(props: any) {
   const intl = useIntl();
 
   useEffect(() => {
-    if (props.title) {
-      setTitle(props.title);
-    } else if (props.funcABI.name) {
+    if (props.funcABI.name) {
       setTitle(props.funcABI.name);
     } else {
       setTitle(props.funcABI.type === 'receive' ? '(receive)' : '(fallback)');
@@ -36,7 +34,7 @@ export function ContractGUI(props: any) {
       .filter((el) => el !== null && el !== undefined)
       .forEach((el: any) => (el.value = ''));
     multiFields.current = [];
-  }, [props.title, props.funcABI]);
+  }, [props.funcABI]);
 
   useEffect(() => {
     if (props.lookupOnly) {
@@ -77,11 +75,7 @@ export function ContractGUI(props: any) {
     }
     const multiJSON = JSON.parse('[' + multiString + ']');
 
-    const encodeObj = txFormat.encodeData(
-      props.funcABI,
-      multiJSON,
-      props.funcABI.type === 'constructor' ? props.evmBC : null,
-    );
+    const encodeObj = txFormat.encodeData(props.funcABI, multiJSON, null);
 
     if (encodeObj.error) {
       console.error(encodeObj.error);

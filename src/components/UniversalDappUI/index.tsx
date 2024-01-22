@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { CopyToClipboard } from '../CopyToClipboard';
 import * as remixLib from '@remix-project/remix-lib';
-import * as ethJSUtil from '@ethereumjs/util';
 import { ContractGUI } from '../ContractGUI';
 import { TreeView, TreeViewItem } from '../TreeView';
 import { BN } from 'bn.js';
@@ -18,6 +17,13 @@ import './index.css';
 
 const txHelper = remixLib.execution.txHelper;
 
+const getFuncABIInputs = (funABI: any) => {
+  if (!funABI.inputs) {
+    return '';
+  }
+  return txHelper.inputParametersDeclarationToString(funABI.inputs);
+};
+
 export interface FuncABI {
   name: string;
   type: string;
@@ -28,38 +34,14 @@ export interface FuncABI {
 }
 
 export function UniversalDappUI(props: any) {
+  const queryParams = new URLSearchParams(location.search);
+  const address = queryParams.get('address') as string;
+  const contractABI = JSON.parse(queryParams.get('abi') as string);
   const intl = useIntl();
-  const [contractABI, setContractABI] = useState<FuncABI[]>([]);
-  const [address, setAddress] = useState<string>('');
   const [expandPath, setExpandPath] = useState<string[]>([]);
   const [llIError, setLlIError] = useState<string>('');
   const [calldataValue, setCalldataValue] = useState<string>('');
-  const [evmBC, setEvmBC] = useState(null);
   const [instanceBalance, setInstanceBalance] = useState(0);
-
-  useEffect(() => {
-    if (!props.instance.abi) {
-      const abi = txHelper.sortAbiFunction(props.instance.contractData.abi);
-
-      setContractABI(abi);
-    } else {
-      setContractABI(props.instance.abi);
-    }
-    if (props.instance.address) {
-      let address =
-        (props.instance.address.slice(0, 2) === '0x' ? '' : '0x') +
-        props.instance.address.toString('hex');
-
-      address = ethJSUtil.toChecksumAddress(address);
-      setAddress(address);
-    }
-  }, [props.instance.address]);
-
-  useEffect(() => {
-    if (props.instance.contractData) {
-      setEvmBC(props.instance.contractData.bytecodeObject);
-    }
-  }, [props.instance.contractData]);
 
   useEffect(() => {
     if (props.instance.balance) {
@@ -276,8 +258,7 @@ export function UniversalDappUI(props: any) {
         <div className="input-group udapp_nameNbuts">
           <div className="udapp_titleText input-group-prepend">
             <span className="input-group-text udapp_spanTitleText">
-              {props.instance.name} at {shortenAddress(address)} (
-              {props.context})
+              {props.instance.name} at {shortenAddress(address)}
             </span>
           </div>
           <div className="btn">
@@ -299,7 +280,7 @@ export function UniversalDappUI(props: any) {
               <FormattedMessage id="udapp.balance" />: {instanceBalance} ETH
             </label>
           </div>
-          {contractABI?.map((funcABI, index) => {
+          {contractABI?.map((funcABI: any, index: any) => {
             if (funcABI.type !== 'function') return null;
             const isConstant =
               funcABI.constant !== undefined ? funcABI.constant : false;
@@ -307,7 +288,7 @@ export function UniversalDappUI(props: any) {
               funcABI.stateMutability === 'view' ||
               funcABI.stateMutability === 'pure' ||
               isConstant;
-            const inputs = props.getFuncABIInputs(funcABI);
+            const inputs = getFuncABIInputs(funcABI);
 
             return (
               <div key={index}>
@@ -326,7 +307,6 @@ export function UniversalDappUI(props: any) {
                     );
                   }}
                   inputs={inputs}
-                  evmBC={evmBC}
                   lookupOnly={lookupOnly}
                   key={index}
                 />

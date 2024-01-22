@@ -7,6 +7,7 @@
     "@reduxjs/toolkit": "^1.9.7",
     "@remix-project/remix-lib": "^0.5.46",
     "bn.js": "^5.2.1",
+    "bootstrap": "^5.3.2",
     "copy-to-clipboard": "^3.3.3",
     "html-react-parser": "^5.1.1",
     "react": "^18.2.0",
