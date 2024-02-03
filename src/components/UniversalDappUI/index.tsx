@@ -14,6 +14,7 @@ import {
   shortenAddress,
 } from '../UiHelper';
 import './index.css';
+import { useAppSelector } from '../../redux/hooks';
 
 const txHelper = remixLib.execution.txHelper;
 
@@ -34,9 +35,10 @@ export interface FuncABI {
 }
 
 export function UniversalDappUI(props: any) {
-  const queryParams = new URLSearchParams(location.search);
-  const address = queryParams.get('address') as string;
-  const contractABI = JSON.parse(queryParams.get('abi') as string);
+  const instance = useAppSelector((state) => state.instance);
+
+  const address = instance.address;
+  const contractABI = instance.abi;
   const intl = useIntl();
   const [expandPath, setExpandPath] = useState<string[]>([]);
   const [llIError, setLlIError] = useState<string>('');
@@ -44,10 +46,10 @@ export function UniversalDappUI(props: any) {
   const [instanceBalance, setInstanceBalance] = useState(0);
 
   useEffect(() => {
-    if (props.instance.balance) {
-      setInstanceBalance(props.instance.balance);
+    if (instance.balance) {
+      setInstanceBalance(instance.balance);
     }
-  }, [props.instance.balance]);
+  }, [instance.balance]);
 
   const sendData = () => {
     setLlIError('');
@@ -56,7 +58,7 @@ export function UniversalDappUI(props: any) {
     const args = {
       funcABI: fallback || receive,
       address,
-      contractName: props.instance.name,
+      contractName: instance.name,
       contractABI,
     };
     const amount = props.sendValue;
@@ -122,21 +124,16 @@ export function UniversalDappUI(props: any) {
   ) => {
     const functionName =
       funcABI.type === 'function' ? funcABI.name : `(${funcABI.type})`;
-    const logMsg = `${lookupOnly ? 'call' : 'transact'} to ${props.instance.name}.${functionName}`;
+    const logMsg = `${lookupOnly ? 'call' : 'transact'} to ${instance.name}.${functionName}`;
 
     props.runTransactions(
-      props.index,
       lookupOnly,
       funcABI,
       inputsValues,
-      props.instance.name,
+      instance.name,
       contractABI,
-      props.instance.contractData,
       address,
       logMsg,
-      props.mainnetPrompt,
-      props.gasEstimationPrompt,
-      props.passphrasePrompt,
       funcIndex,
     );
   };
@@ -258,7 +255,7 @@ export function UniversalDappUI(props: any) {
         <div className="input-group udapp_nameNbuts">
           <div className="udapp_titleText input-group-prepend">
             <span className="input-group-text udapp_spanTitleText">
-              {props.instance.name} at {shortenAddress(address)}
+              {instance.name} at {shortenAddress(address)}
             </span>
           </div>
           <div className="btn">
@@ -313,18 +310,16 @@ export function UniversalDappUI(props: any) {
                 {lookupOnly && (
                   <div className="udapp_value" data-id="udapp_value">
                     <TreeView id="treeView">
-                      {Object.keys(props.instance.decodedResponse || {}).map(
+                      {Object.keys(instance.decodedResponse || {}).map(
                         (key) => {
                           const funcIndex = index.toString();
-                          const response = props.instance.decodedResponse[key];
+                          const response = instance.decodedResponse[key];
 
                           return key === funcIndex
                             ? Object.keys(response || {}).map(
                                 (innerkey, _index) => {
                                   return renderData(
-                                    props.instance.decodedResponse[key][
-                                      innerkey
-                                    ],
+                                    instance.decodedResponse[key][innerkey],
                                     response,
                                     innerkey,
                                     innerkey,

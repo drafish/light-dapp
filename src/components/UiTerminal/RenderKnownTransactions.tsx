@@ -11,7 +11,6 @@ const RenderKnownTransactions = ({
   resolvedData,
   logs,
   index,
-  plugin,
   showTableHash,
   txDetails,
   provider,

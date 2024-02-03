@@ -11,7 +11,6 @@ const RenderCall = ({
   resolvedData,
   logs,
   index,
-  plugin,
   showTableHash,
   txDetails,
 }: any) => {

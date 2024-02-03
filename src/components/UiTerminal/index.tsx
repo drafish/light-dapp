@@ -1,17 +1,12 @@
 import React, { useState, useEffect, useRef, type SyntheticEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import TerminalWelcomeMessage from './terminalWelcome';
 import { CustomTooltip } from '../CustomTooltip';
 import RenderCall from './RenderCall';
 import RenderKnownTransactions from './RenderKnownTransactions';
 import parse from 'html-react-parser';
 
-import {
-  EMPTY_BLOCK,
-  KNOWN_TRANSACTION,
-  type RemixUiTerminalProps,
-} from './types';
+import { KNOWN_TRANSACTION } from './types';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import './index.css';
@@ -20,12 +15,9 @@ export interface ClipboardEvent<T = Element> extends SyntheticEvent<T, any> {
   clipboardData: DataTransfer;
 }
 
-export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
-  const [isOpen, setIsOpen] = useState<boolean>(true);
+export const RemixUiTerminal = () => {
   const dispatch = useAppDispatch();
   const { journalBlocks } = useAppSelector((state) => state.terminal);
-
-  const [clearConsole, setClearConsole] = useState(false);
 
   const [showTableHash, setShowTableHash] = useState<any[]>([]);
 
@@ -47,7 +39,6 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
   }, [journalBlocks.length]);
 
   const handleClearConsole = () => {
-    setClearConsole(true);
     typeWriterIndexes.current = [];
     dispatch({ type: 'terminal/save', payload: { console: [] } });
     inputEl.current.focus();
@@ -66,30 +57,9 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
     scrollToBottom();
   };
 
-  const handleToggleTerminal = () => {
-    setIsOpen(!isOpen);
-    props.plugin.call('layout', 'minimize', props.plugin.profile.name, isOpen);
-  };
-
-  useEffect(() => {
-    props.plugin.on(
-      'layout',
-      'change',
-      (panels: { terminal: { minimized: any } }) => {
-        setIsOpen(!panels.terminal.minimized);
-      },
-    );
-
-    return () => {
-      props.plugin.off('layout', 'change');
-    };
-  }, []);
-
   const classNameBlock = 'remix_ui_terminal_block px-4 py-1 text-break';
 
-  return !props.visible ? (
-    <></>
-  ) : (
+  return (
     <div
       style={{ flexGrow: 1 }}
       className="remix_ui_terminal_panel"
@@ -101,24 +71,6 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
           ref={terminalMenu}
           data-id="terminalToggleMenu"
         >
-          <CustomTooltip
-            placement="top"
-            tooltipId="terminalToggle"
-            tooltipClasses="text-nowrap"
-            tooltipText={
-              isOpen ? (
-                <FormattedMessage id="terminal.hideTerminal" />
-              ) : (
-                <FormattedMessage id="terminal.showTerminal" />
-              )
-            }
-          >
-            <i
-              className={`mx-2 remix_ui_terminal_toggleTerminal fas ${isOpen ? 'fa-angle-double-down' : 'fa-angle-double-up'}`}
-              data-id="terminalToggleIcon"
-              onClick={handleToggleTerminal}
-            ></i>
-          </CustomTooltip>
           <div
             className="mx-2 remix_ui_terminal_console"
             id="clearConsole"
@@ -155,23 +107,8 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
             className="remix_ui_terminal_journal d-flex flex-column pt-3 pb-4 px-2 mx-2 mr-0"
             data-id="terminalJournal"
           >
-            {!clearConsole && <TerminalWelcomeMessage />}
             {journalBlocks?.map((x: any, index: number) => {
-              if (x.name === EMPTY_BLOCK) {
-                return (
-                  <div className={classNameBlock} data-id="block" key={index}>
-                    <span className="remix_ui_terminal_tx">
-                      <div className="remix_ui_terminal_txItem">
-                        [
-                        <span className="remix_ui_terminal_txItemTitle">
-                          block:{x.message} -{' '}
-                        </span>{' '}
-                        0 {'transactions'} ]
-                      </div>
-                    </span>
-                  </div>
-                );
-              } else if (x.name === KNOWN_TRANSACTION) {
+              if (x.name === KNOWN_TRANSACTION) {
                 return x.message.map((trans: any) => {
                   return (
                     <div
@@ -185,7 +122,6 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
                           resolvedData={trans.resolvedData}
                           logs={trans.logs}
                           index={index}
-                          plugin={props.plugin}
                           showTableHash={showTableHash}
                           txDetails={txDetails}
                         />
@@ -196,7 +132,6 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
                           resolvedData={trans.resolvedData}
                           logs={trans.logs}
                           index={index}
-                          plugin={props.plugin}
                           showTableHash={showTableHash}
                           txDetails={txDetails}
                           provider={x.provider}
@@ -207,11 +142,6 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
                 });
               } else if (Array.isArray(x.message)) {
                 return x.message.map((msg: any, i: number) => {
-                  // strictly check condition on 0, false, except undefined, NaN.
-                  // if you type `undefined`, terminal automatically throws error, it's error message: "undefined" is not valid JSON
-                  // if you type `NaN`, terminal would give `null`
-                  if (msg === false || msg === 0) msg = msg.toString();
-                  else if (!msg) msg = 'null';
                   if (React.isValidElement(msg)) {
                     return (
                       <div className="px-4 block" data-id="block" key={i}>

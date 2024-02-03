@@ -3,7 +3,41 @@ import { type ModelType } from '../store';
 
 const Model: ModelType = {
   namespace: 'instance',
-  state: {},
+  state: {
+    name: 'Storage',
+    address: '0x82068d60D95cdfe50446E757c994c0a2116049AA',
+    balance: 0,
+    network: 'goerli',
+    decodedResponse: '',
+    abi: [
+      {
+        inputs: [],
+        name: 'retrieve',
+        outputs: [
+          {
+            internalType: 'uint256',
+            name: '',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [
+          {
+            internalType: 'uint256',
+            name: 'num',
+            type: 'uint256',
+          },
+        ],
+        name: 'store',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ],
+  },
   reducers: {
     save(state, { payload }) {
       return { ...state, ...payload };

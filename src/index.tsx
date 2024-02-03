@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
-import './index.css';
+import { IntlProvider } from 'react-intl';
+import zhJson from './locales/zh';
 import App from './App';
 import { store } from './redux/store';
 
@@ -10,6 +11,8 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <Provider store={store}>
-    <App />
+    <IntlProvider locale="zh" messages={zhJson}>
+      <App />
+    </IntlProvider>
   </Provider>,
 );
