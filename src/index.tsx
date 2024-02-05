@@ -5,6 +5,7 @@ import { IntlProvider } from 'react-intl';
 import zhJson from './locales/zh';
 import App from './App';
 import { store } from './redux/store';
+import './index.css';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,

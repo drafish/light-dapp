@@ -15,7 +15,9 @@ const Context = ({ opts, provider }: { opts: any; provider: string }) => {
   const block = data.receipt
     ? data.receipt.blockNumber
     : data.blockNumber || '';
-  const i = data.receipt ? data.transactionIndex : data.transactionIndex;
+  const i = data.receipt
+    ? data.receipt.transactionIndex
+    : data.transactionIndex;
   const value = val ? typeConversion.toInt(val) : 0;
 
   if (provider?.startsWith('vm')) {

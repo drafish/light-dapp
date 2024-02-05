@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UniversalDappUI } from '../../components/UniversalDappUI';
 import { SettingsUI } from '../../components/SettingsUI';
 import RemixUiTerminal from '../../components/UiTerminal';
+import { useAppDispatch } from '../../redux/hooks';
 
 const HomePage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch({ type: 'settings/connect' });
+  }, []);
   return (
     <div>
       <div className="grid">

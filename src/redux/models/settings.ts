@@ -1,4 +1,5 @@
 import { type ModelType } from '../store';
+import injected from '../../utils/injected';
 
 const Model: ModelType = {
   namespace: 'settings',
@@ -18,7 +19,18 @@ const Model: ModelType = {
       return { ...state, ...payload };
     },
   },
-  effects: {},
+  effects: {
+    *connect() {
+      // @ts-expect-error
+      const web3Provider = window.ethereum;
+      yield web3Provider.request({ method: 'eth_requestAccounts' });
+      injected.setProvider(web3Provider);
+      injected.getAccounts();
+      setInterval(() => {
+        injected.getAccounts();
+      }, 30000);
+    },
+  },
 };
 
 export default Model;

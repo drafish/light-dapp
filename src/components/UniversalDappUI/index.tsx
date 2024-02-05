@@ -14,7 +14,7 @@ import {
   shortenAddress,
 } from '../UiHelper';
 import './index.css';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 
 const txHelper = remixLib.execution.txHelper;
 
@@ -36,6 +36,7 @@ export interface FuncABI {
 
 export function UniversalDappUI(props: any) {
   const instance = useAppSelector((state) => state.instance);
+  const dispatch = useAppDispatch();
 
   const address = instance.address;
   const contractABI = instance.abi;
@@ -126,16 +127,19 @@ export function UniversalDappUI(props: any) {
       funcABI.type === 'function' ? funcABI.name : `(${funcABI.type})`;
     const logMsg = `${lookupOnly ? 'call' : 'transact'} to ${instance.name}.${functionName}`;
 
-    props.runTransactions(
-      lookupOnly,
-      funcABI,
-      inputsValues,
-      instance.name,
-      contractABI,
-      address,
-      logMsg,
-      funcIndex,
-    );
+    dispatch({
+      type: 'instance/runTransactions',
+      payload: {
+        lookupOnly,
+        funcABI,
+        inputsValues,
+        name: instance.name,
+        contractABI,
+        address,
+        logMsg,
+        funcIndex,
+      },
+    });
   };
 
   const extractDataDefault = (item: any[] | any, parent?: any) => {
