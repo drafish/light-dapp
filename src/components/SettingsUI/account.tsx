@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { CopyToClipboard } from '../CopyToClipboard';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
@@ -24,7 +26,7 @@ export function AccountUI() {
       <label className="udapp_settingsLabel">
         <FormattedMessage id="udapp.account" />
         {isRequesting && (
-          <i className="fa fa-spinner fa-pulse ml-2" aria-hidden="true"></i>
+          <FontAwesomeIcon className="ml-2" icon={faSpinner} pulse />
         )}
       </label>
       <div className="udapp_account">
