@@ -17,7 +17,7 @@ export function GasPriceUI() {
         <FormattedMessage id="udapp.gasLimit" />
       </label>
       <CustomTooltip
-        placement={'right'}
+        placement={'top'}
         tooltipClasses="text-nowrap"
         tooltipId="remixGasPriceTooltip"
         tooltipText={<FormattedMessage id="udapp.tooltipText4" />}

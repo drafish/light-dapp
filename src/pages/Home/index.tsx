@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { UniversalDappUI } from '../../components/UniversalDappUI';
 import { SettingsUI } from '../../components/SettingsUI';
 import RemixUiTerminal from '../../components/UiTerminal';
+import DragBar from '../../components/DragBar';
 import { useAppDispatch } from '../../redux/hooks';
 
 const HomePage: React.FC = () => {
@@ -9,6 +10,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     dispatch({ type: 'settings/connect' });
   }, []);
+
   return (
     <div>
       <div className="grid">
@@ -19,6 +21,7 @@ const HomePage: React.FC = () => {
           <SettingsUI />
         </div>
       </div>
+      <DragBar />
       <RemixUiTerminal />
     </div>
   );
