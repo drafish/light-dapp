@@ -3,17 +3,21 @@ import { UniversalDappUI } from '../../components/UniversalDappUI';
 import { SettingsUI } from '../../components/SettingsUI';
 import RemixUiTerminal from '../../components/UiTerminal';
 import DragBar from '../../components/DragBar';
-import { useAppDispatch } from '../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
 const HomePage: React.FC = () => {
   const dispatch = useAppDispatch();
+  const height = useAppSelector((state) => state.terminal.height);
   useEffect(() => {
     dispatch({ type: 'settings/connect' });
   }, []);
 
   return (
     <div>
-      <div className="grid">
+      <div
+        className="row m-0"
+        style={{ height: window.innerHeight - height - 5, overflowY: 'auto' }}
+      >
         <div className="col-9 d-inline-block">
           <UniversalDappUI />
         </div>

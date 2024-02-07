@@ -1,18 +1,11 @@
-// eslint-disable-next-line no-use-before-define
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { CopyToClipboard } from '../CopyToClipboard';
 import * as remixLib from '@remix-project/remix-lib';
 import { ContractGUI } from '../ContractGUI';
 import { TreeView, TreeViewItem } from '../TreeView';
 import { BN } from 'bn.js';
 import { CustomTooltip } from '../CustomTooltip';
-import {
-  is0XPrefixed,
-  isHexadecimal,
-  isNumeric,
-  shortenAddress,
-} from '../UiHelper';
+import { is0XPrefixed, isHexadecimal, isNumeric } from '../UiHelper';
 import './index.css';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 
@@ -44,13 +37,6 @@ export function UniversalDappUI(props: any) {
   const [expandPath, setExpandPath] = useState<string[]>([]);
   const [llIError, setLlIError] = useState<string>('');
   const [calldataValue, setCalldataValue] = useState<string>('');
-  const [instanceBalance, setInstanceBalance] = useState(0);
-
-  useEffect(() => {
-    if (instance.balance) {
-      setInstanceBalance(instance.balance);
-    }
-  }, [instance.balance]);
 
   const sendData = () => {
     setLlIError('');
@@ -250,138 +236,132 @@ export function UniversalDappUI(props: any) {
   };
 
   return (
-    <div
-      className={`instance udapp_instance udapp_run-instance border-dark bg-light`}
-      id={`instance${address}`}
-      data-shared="universalDappUiInstance"
-    >
-      <div className="udapp_title pb-0 alert alert-secondary">
-        <div className="input-group udapp_nameNbuts">
-          <div className="udapp_titleText input-group-prepend">
-            <span className="input-group-text udapp_spanTitleText">
-              {instance.name} at {shortenAddress(address)}
-            </span>
-          </div>
-          <div className="btn">
-            <CopyToClipboard
-              tip={intl.formatMessage({ id: 'udapp.copy' })}
-              content={address}
-              direction={'top'}
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        className="udapp_cActionsWrapper"
-        data-id="universalDappUiContractActionWrapper"
-      >
-        <div className="udapp_contractActionsContainer">
-          <div className="d-flex" data-id="instanceContractBal">
-            <label>
-              <FormattedMessage id="udapp.balance" />: {instanceBalance} ETH
-            </label>
-          </div>
-          {contractABI?.map((funcABI: any, index: any) => {
-            if (funcABI.type !== 'function') return null;
-            const isConstant =
-              funcABI.constant !== undefined ? funcABI.constant : false;
-            const lookupOnly =
-              funcABI.stateMutability === 'view' ||
-              funcABI.stateMutability === 'pure' ||
-              isConstant;
-            const inputs = getFuncABIInputs(funcABI);
+    <div className="row m-0">
+      {contractABI?.map((funcABI: any, index: any) => {
+        if (funcABI.type !== 'function') return null;
+        const isConstant =
+          funcABI.constant !== undefined ? funcABI.constant : false;
+        const lookupOnly =
+          funcABI.stateMutability === 'view' ||
+          funcABI.stateMutability === 'pure' ||
+          isConstant;
+        const inputs = getFuncABIInputs(funcABI);
 
-            return (
-              <div key={index}>
-                <ContractGUI
-                  funcABI={funcABI}
-                  clickCallBack={(
-                    valArray: { name: string; type: string }[],
-                    inputsValues: string,
-                  ) => {
-                    runTransaction(
-                      lookupOnly,
-                      funcABI,
-                      valArray,
-                      inputsValues,
-                      index,
-                    );
-                  }}
-                  inputs={inputs}
-                  lookupOnly={lookupOnly}
-                  key={index}
-                />
-                {lookupOnly && (
-                  <div className="udapp_value" data-id="udapp_value">
-                    <TreeView id="treeView">
-                      {Object.keys(instance.decodedResponse || {}).map(
-                        (key) => {
-                          const funcIndex = index.toString();
-                          const response = instance.decodedResponse[key];
+        return (
+          <div
+            key={index}
+            className={`instance udapp_instance udapp_run-instance border-dark bg-light col m-2`}
+            data-shared="universalDappUiInstance"
+          >
+            <div
+              className="udapp_cActionsWrapper"
+              data-id="universalDappUiContractActionWrapper"
+            >
+              <div className="udapp_contractActionsContainer">
+                <div>
+                  <ContractGUI
+                    funcABI={funcABI}
+                    clickCallBack={(
+                      valArray: { name: string; type: string }[],
+                      inputsValues: string,
+                    ) => {
+                      runTransaction(
+                        lookupOnly,
+                        funcABI,
+                        valArray,
+                        inputsValues,
+                        index,
+                      );
+                    }}
+                    inputs={inputs}
+                    lookupOnly={lookupOnly}
+                    key={index}
+                  />
+                  {lookupOnly && (
+                    <div className="udapp_value" data-id="udapp_value">
+                      <TreeView id="treeView">
+                        {Object.keys(instance.decodedResponse || {}).map(
+                          (key) => {
+                            const funcIndex = index.toString();
+                            const response = instance.decodedResponse[key];
 
-                          return key === funcIndex
-                            ? Object.keys(response || {}).map(
-                                (innerkey, _index) => {
-                                  return renderData(
-                                    instance.decodedResponse[key][innerkey],
-                                    response,
-                                    innerkey,
-                                    innerkey,
-                                  );
-                                },
-                              )
-                            : null;
-                        },
-                      )}
-                    </TreeView>
-                  </div>
-                )}
+                            return key === funcIndex
+                              ? Object.keys(response || {}).map(
+                                  (innerkey, _index) => {
+                                    return renderData(
+                                      instance.decodedResponse[key][innerkey],
+                                      response,
+                                      innerkey,
+                                      innerkey,
+                                    );
+                                  },
+                                )
+                              : null;
+                          },
+                        )}
+                      </TreeView>
+                    </div>
+                  )}
+                </div>
               </div>
-            );
-          })}
-        </div>
-        <div className="d-flex flex-column">
-          <div className="d-flex flex-row justify-content-between mt-2">
-            <div className="py-2 border-top d-flex justify-content-start flex-grow-1">
-              <FormattedMessage id="udapp.lowLevelInteractions" />
             </div>
           </div>
-          <div className="d-flex flex-column align-items-start">
-            <label className="">CALLDATA</label>
-            <div className="d-flex justify-content-end w-100 align-items-center">
-              <CustomTooltip
-                placement="bottom"
-                tooltipClasses="text-nowrap"
-                tooltipId="deployAndRunLLTxCalldataInputTooltip"
-                tooltipText={<FormattedMessage id="udapp.tooltipText9" />}
-              >
-                <input
-                  id="deployAndRunLLTxCalldata"
-                  onChange={handleCalldataChange}
-                  className="udapp_calldataInput form-control"
-                />
-              </CustomTooltip>
-              <CustomTooltip
-                placement="right"
-                tooltipClasses="text-nowrap"
-                tooltipId="deployAndRunLLTxCalldataTooltip"
-                tooltipText={<FormattedMessage id="udapp.tooltipText10" />}
-              >
-                <button
-                  id="deployAndRunLLTxSendTransaction"
-                  data-id="pluginManagerSettingsDeployAndRunLLTxSendTransaction"
-                  className="btn udapp_instanceButton p-0 w-50 border-warning text-warning"
-                  onClick={sendData}
-                >
-                  Transact
-                </button>
-              </CustomTooltip>
+        );
+      })}
+
+      <div
+        className={`instance udapp_instance udapp_run-instance border-dark bg-light col m-2`}
+        data-shared="universalDappUiInstance"
+      >
+        <div
+          className="udapp_cActionsWrapper"
+          data-id="universalDappUiContractActionWrapper"
+        >
+          <div className="udapp_contractActionsContainer">
+            <div className="d-flex flex-column">
+              <div className="d-flex flex-row justify-content-between mt-2">
+                <div className="py-2 d-flex justify-content-start flex-grow-1">
+                  <FormattedMessage id="udapp.lowLevelInteractions" />
+                </div>
+              </div>
+              <div className="d-flex flex-column align-items-start">
+                <label className="">CALLDATA</label>
+                <div className="d-flex justify-content-end w-100 align-items-center">
+                  <CustomTooltip
+                    placement="bottom"
+                    tooltipClasses="text-nowrap"
+                    tooltipId="deployAndRunLLTxCalldataInputTooltip"
+                    tooltipText={<FormattedMessage id="udapp.tooltipText9" />}
+                  >
+                    <input
+                      id="deployAndRunLLTxCalldata"
+                      onChange={handleCalldataChange}
+                      className="udapp_calldataInput form-control"
+                    />
+                  </CustomTooltip>
+                  <CustomTooltip
+                    placement="right"
+                    tooltipClasses="text-nowrap"
+                    tooltipId="deployAndRunLLTxCalldataTooltip"
+                    tooltipText={<FormattedMessage id="udapp.tooltipText10" />}
+                  >
+                    <button
+                      id="deployAndRunLLTxSendTransaction"
+                      data-id="pluginManagerSettingsDeployAndRunLLTxSendTransaction"
+                      className="btn udapp_instanceButton p-0 w-50 border-warning text-warning"
+                      onClick={sendData}
+                    >
+                      Transact
+                    </button>
+                  </CustomTooltip>
+                </div>
+              </div>
+              <div>
+                <label id="deployAndRunLLTxError" className="text-danger my-2">
+                  {llIError}
+                </label>
+              </div>
             </div>
-          </div>
-          <div>
-            <label id="deployAndRunLLTxError" className="text-danger my-2">
-              {llIError}
-            </label>
           </div>
         </div>
       </div>
