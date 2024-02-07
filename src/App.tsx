@@ -2,8 +2,6 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import CreatePage from './pages/Create';
 import HomePage from './pages/Home';
-import RemixHomePage from './pages/Remix/Home';
-import RemixCreatePage from './pages/Remix/Create';
 
 export const router = createBrowserRouter([
   {
@@ -13,14 +11,6 @@ export const router = createBrowserRouter([
   {
     path: '/create',
     element: <CreatePage />,
-  },
-  {
-    path: '/remix',
-    element: <RemixHomePage />,
-  },
-  {
-    path: '/remix/create',
-    element: <RemixCreatePage />,
   },
 ]);
 
