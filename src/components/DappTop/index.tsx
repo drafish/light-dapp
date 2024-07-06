@@ -30,7 +30,7 @@ const DappTop: React.FC = () => {
   const shareTitle = encodeURIComponent('Hello everyone, this is my dapp!');
 
   return (
-    <div className="mx-3 my-2 p-3 w-auto bg-light d-flex justify-content-between">
+    <div className="col-10 p-3 bg-light w-auto d-flex justify-content-between">
       <div>
         {title && <h1>{title}</h1>}
         {details && <span>{details}</span>}

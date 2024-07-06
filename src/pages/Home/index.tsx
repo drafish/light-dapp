@@ -99,7 +99,12 @@ const HomePage: React.FC = () => {
         }}
       >
         <div className="col-xl-9 col-lg-8 col-md-7 d-inline-block pr-0">
-          <DappTop />
+          <div className="mx-3 my-2 row">
+            <div className="col-2 text-center">
+              <img src="/logo.png" style={{ width: 95, height: 95 }} />
+            </div>
+            <DappTop />
+          </div>
           <UniversalDappUI />
         </div>
         <div className="col-xl-3 col-lg-4 col-md-5 d-inline-block pl-0">
