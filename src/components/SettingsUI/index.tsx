@@ -11,12 +11,12 @@ import { shortenAddress } from '../UiHelper';
 import { AppContext } from '../../contexts';
 import { CustomTooltip } from '../CustomTooltip';
 import { isMobile } from '../../utils/tools';
+import { LowLevelInteractions } from '../UniversalDappUI/lowLevelInteractions';
 
 export function SettingsUI() {
   const intl = useIntl();
   const { appState } = useContext(AppContext);
   const { balance, name, address, verified } = appState.instance;
-  const { provider } = appState.settings;
 
   return (
     <div className="px-4">
@@ -57,6 +57,7 @@ export function SettingsUI() {
         <ValueUI />
         {/* <ThemeUI /> */}
       </div>
+      <LowLevelInteractions />
       <div className="p-2 w-auto d-flex justify-content-between align-items-center">
         <span>
           QuickDapp by{' '}

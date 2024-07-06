@@ -55,6 +55,15 @@ export const initInstance = async () => {
     networkName: resp.data.network,
     provider: window.ethereum ? 'metamask' : 'walletconnect',
   });
+  updateInstanceBalance(resp.data.address);
+  setInterval(() => {
+    updateInstanceBalance(resp.data.address);
+  }, 30000);
+};
+
+export const updateInstanceBalance = async (address: string) => {
+  const balance = await txRunner.getBalanceInEther(address);
+  await dispatch({ type: 'SET_INSTANCE', payload: { balance } });
 };
 
 export const saveSettings = async (payload: any) => {
@@ -85,21 +94,30 @@ export const runTransactions = async (payload: any) => {
   const { address, decodedResponse, name } = state.instance;
   const value = Web3.utils.toWei(sendValue, sendUnit);
 
-  const { dataHex, error } = buildData(payload.funcABI, payload.inputsValues);
-
-  if (error) {
-    await log({
-      message: [`${payload.logMsg} errored: ${error}`],
-      style: 'text-danger',
-    });
-    return;
-  }
   const tx = {
     to: address,
-    data: dataHex,
+    data: '',
     from: selectedAccount,
     value,
   };
+
+  const isFunction = payload.funcABI.type === 'function';
+
+  if (isFunction) {
+    const { dataHex, error } = buildData(payload.funcABI, payload.inputsValues);
+
+    if (error) {
+      await log({
+        message: [`${payload.logMsg} errored: ${error}`],
+        style: 'text-danger',
+      });
+      return;
+    }
+
+    tx.data = dataHex as string;
+  } else {
+    tx.data = payload.inputsValues;
+  }
 
   if (payload.lookupOnly) {
     await log({
@@ -153,10 +171,12 @@ export const runTransactions = async (payload: any) => {
             contractName: name,
             to: address,
             fn: payload.funcABI.name,
-            params: eventsDecoder._decodeInputParams(
-              dataHex?.replace('0x', '').substring(8),
-              payload.funcABI
-            ),
+            params: isFunction
+              ? eventsDecoder._decodeInputParams(
+                  tx.data?.replace('0x', '').substring(8),
+                  payload.funcABI
+                )
+              : tx.data,
             decodedReturnValue: txFormat.decodeResponse(resp, payload.funcABI),
           },
         },
@@ -175,10 +195,12 @@ export const runTransactions = async (payload: any) => {
             contractName: name,
             to: address,
             fn: payload.funcABI.name,
-            params: eventsDecoder._decodeInputParams(
-              dataHex?.replace('0x', '').substring(8),
-              payload.funcABI
-            ),
+            params: isFunction
+              ? eventsDecoder._decodeInputParams(
+                  tx.data?.replace('0x', '').substring(8),
+                  payload.funcABI
+                )
+              : tx.data,
           },
         },
       ],

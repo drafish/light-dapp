@@ -1,6 +1,6 @@
 {
   "name": "MyToken",
-  "address": "0x638f62fCec18Fd8D284f5902d201B64499c8D397",
+  "address": "0x0d52590858e2a79278e665c21f9caf98d8b4b618",
   "network": "Sepolia (11155111) network",
   "title": "Owner",
   "details": "Set & change owner",
@@ -491,5 +491,17 @@
     "facebook"
   ],
   "noTerminal": false,
-  "verified": true
+  "verified": true,
+  "solcVersion": {
+    "version": "0.8.26",
+    "canReceive": true
+  },
+  "fallback": {
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  "receive": {
+    "stateMutability": "payable",
+    "type": "receive"
+  }
 }

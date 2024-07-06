@@ -1,15 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { AppContext } from '../../contexts';
-import { initInstance } from '../../actions';
 
 const DappTop: React.FC = () => {
   const {
     appState: { instance },
   } = useContext(AppContext);
   const { shareTo, title, details } = instance;
-  useEffect(() => {
-    initInstance();
-  }, []);
 
   const getBoxPositionOnWindowCenter = (width: number, height: number) => ({
     left:

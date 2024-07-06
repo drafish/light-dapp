@@ -6,6 +6,7 @@ export const appInitialState: any = {
     network: '',
     decodedResponse: {},
     abi: [],
+    solcVersion: {},
   },
   settings: {
     sendValue: '0',
