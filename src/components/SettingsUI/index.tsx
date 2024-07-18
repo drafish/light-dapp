@@ -84,6 +84,7 @@ export function SettingsUI() {
             role="button"
             aria-disabled="true"
             target="_blank"
+            data-id="viewSourceCode"
           >
             <FormattedMessage id="udapp.viewSourceCode" />
           </a>

@@ -32,8 +32,8 @@ const DappTop: React.FC = () => {
   return (
     <div className="col-10 p-3 bg-light w-auto d-flex justify-content-between">
       <div>
-        {title && <h1>{title}</h1>}
-        {details && <span>{details}</span>}
+        {title && <h1 data-id="dappTitle">{title}</h1>}
+        {details && <span data-id="dappInstructions">{details}</span>}
       </div>
       {shareTo && (
         <div>

@@ -33,7 +33,7 @@ export function LocaleUI() {
       <div className="d-flex align-items-center">
         <select
           id="txorigin"
-          data-id="runTabSelectAccount"
+          data-id="localeSelectOptions"
           name="txorigin"
           className="form-control overflow-hidden w-100 font-weight-normal custom-select pr-4"
           value={selectedLocaleCode || localeCodeList[0]}
@@ -42,7 +42,7 @@ export function LocaleUI() {
           }}
         >
           {localeCodeList.map((localeCode) => (
-            <option value={localeCode} key={localeCode}>
+            <option value={localeCode} key={localeCode} data-id={`localeOption${localeCode}`}>
               {localeCode.toUpperCase()}
             </option>
           ))}

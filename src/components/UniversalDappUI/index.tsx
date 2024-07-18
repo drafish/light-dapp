@@ -178,12 +178,12 @@ export function UniversalDappUI(props: any) {
                   return (
                     <div
                       className="p-2 bg-light mb-2"
-                      data-id="universalDappUiContractActionWrapper"
+                      data-id={`function${funcId}`}
                       key={funcId}
                     >
                       <div className="w-100 mb-2">
                         <div>
-                          {funcABI.title && <h3>{funcABI.title}</h3>}
+                          {funcABI.title && <h3 data-id={`functionTitle${funcId}`}>{funcABI.title}</h3>}
                           <ContractGUI
                             funcABI={funcABI}
                             clickCallBack={(
@@ -203,7 +203,7 @@ export function UniversalDappUI(props: any) {
                             key={funcId}
                           />
                           {funcABI.details && (
-                            <div className="pt-2 udapp_intro">
+                            <div className="pt-2 udapp_intro" data-id={`functionInstructions${funcId}`}>
                               {funcABI.details}
                             </div>
                           )}
